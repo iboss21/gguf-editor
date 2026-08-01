@@ -1,0 +1,26 @@
+{
+  "name": "gguf-editor",
+  "version": "0.1.0",
+  "description": "A local-first, browser-based viewer and editor for GGUF model file metadata and tensor information. Files are read and rebuilt entirely on your machine; nothing is uploaded anywhere.",
+  "type": "module",
+  "license": "CC0-1.0",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/dev-server.mjs",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iboss21/gguf-editor.git"
+  },
+  "keywords": [
+    "gguf",
+    "llama.cpp",
+    "llm",
+    "editor",
+    "metadata"
+  ]
+}
