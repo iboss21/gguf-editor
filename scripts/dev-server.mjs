@@ -11,7 +11,10 @@ import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = fileURLToPath(new URL('..', import.meta.url));
+// `new URL('..', ...)` yields a directory URL (trailing slash), and
+// `fileURLToPath` preserves that trailing separator on POSIX; strip it so
+// `ROOT + sep` prefix checks below behave consistently.
+const ROOT = fileURLToPath(new URL('..', import.meta.url)).replace(/[/\\]+$/, '');
 const PORT = Number(process.env.PORT) || 8080;
 const HOST = process.env.HOST || '127.0.0.1';
 

@@ -118,6 +118,8 @@ async function loadFile(file) {
     model = await parseGGUF(file);
     fileName = file.name;
     el.editor.hidden = false;
+    el.metadataFilter.value = '';
+    el.tensorFilter.value = '';
     renderAll();
     showStatus(`Loaded ${file.name}`, 'success');
   } catch (err) {
