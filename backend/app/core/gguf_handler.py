@@ -51,6 +51,17 @@ class GGUFHandlerError(Exception):
     """Raised for GGUF read/write failures surfaced to the API layer as 4xx/5xx."""
 
 
+def is_virtual_key(key: str) -> bool:
+    """Whether ``key`` is a reader-synthesized header field (``GGUF.*``).
+
+    ``GGUFReader`` exposes the file header (version, tensor count, kv count)
+    as pseudo metadata fields. They are not real key/value entries, and
+    ``GGUFWriter`` regenerates them from the data it is given, so they must
+    never be copied verbatim or edited.
+    """
+    return key.startswith(_VIRTUAL_PREFIXES)
+
+
 # --------------------------------------------------------------------------
 # Reading
 # --------------------------------------------------------------------------
@@ -87,7 +98,9 @@ def _field_to_metadata_item(field: ReaderField) -> MetadataItem:
         truncated=truncated,
         # Large arrays (token lists, merges, ...) aren't practical to hand
         # edit in a table; the AI assistant can still target them by key.
-        editable=not truncated,
+        # `GGUF.*` fields are synthesized by the reader from the file header
+        # and regenerated on write, so they are never user-editable.
+        editable=not truncated and not is_virtual_key(field.name),
     )
 
 
@@ -190,6 +203,14 @@ def _plan_edits(edits: list[MetadataEdit]) -> tuple[dict[str, _PlannedValue], se
     renames: dict[str, str] = {}
 
     for edit in edits:
+        # `GGUF.*` entries are header fields the writer regenerates; letting an
+        # edit through would add a bogus duplicate key to the output file.
+        for candidate in (edit.key, edit.new_key):
+            if candidate and is_virtual_key(candidate):
+                raise GGUFHandlerError(
+                    f"'{candidate}' is a GGUF header field managed automatically and cannot be edited"
+                )
+
         if edit.op == EditOp.DELETE:
             deletes.add(edit.key)
             sets.pop(edit.key, None)
@@ -236,7 +257,7 @@ def write_with_edits(input_path: Path, output_path: Path, edits: list[MetadataEd
     try:
         for field in reader.fields.values():
             name = field.name
-            if name == Keys.General.ARCHITECTURE or name.startswith(_VIRTUAL_PREFIXES):
+            if name == Keys.General.ARCHITECTURE or is_virtual_key(name):
                 continue
 
             target_name = renames.get(name, name)
@@ -362,7 +383,7 @@ _REBRAND_EXCLUDED_PREFIXES = ("tokenizer.",)
 
 def is_rebrand_safe_key(key: str, architecture: str | None) -> bool:
     """Whether ``key`` is safe to touch with a cosmetic bulk find/replace."""
-    if key in _REBRAND_EXCLUDED_KEYS:
+    if key in _REBRAND_EXCLUDED_KEYS or is_virtual_key(key):
         return False
     if key.startswith(_REBRAND_EXCLUDED_PREFIXES):
         return False

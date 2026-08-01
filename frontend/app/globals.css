@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------
+   Design tokens
+
+   Semantic colours live on `--app-*` variables so they can be swapped for
+   the light theme in one place; Tailwind's theme maps onto them, which means
+   every utility (`bg-surface`, `text-muted`, …) follows the active scheme.
+   ------------------------------------------------------------------------- */
+
+:root {
+  --app-canvas: #0a0b0d;
+  --app-surface: #111318;
+  --app-raised: #171a20;
+  --app-line: #242832;
+  --app-line-strong: #333947;
+  --app-text: #e7e9ee;
+  --app-muted: #8b919f;
+  --app-faint: #5e6472;
+  --app-accent: #eaa64a;
+  --app-accent-contrast: #1a1206;
+  --app-danger: #f0666b;
+  --app-success: #4ec27f;
+  --app-info: #6aa9f0;
+  --app-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.7);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --app-canvas: #f4f5f7;
+    --app-surface: #ffffff;
+    --app-raised: #ffffff;
+    --app-line: #e2e4ea;
+    --app-line-strong: #cbcfd9;
+    --app-text: #14161b;
+    --app-muted: #626875;
+    --app-faint: #8a909d;
+    --app-accent: #b5761a;
+    --app-accent-contrast: #fffaf1;
+    --app-danger: #cf3239;
+    --app-success: #1f8a4c;
+    --app-info: #2a6fc4;
+    --app-shadow: 0 12px 32px -16px rgb(15 18 25 / 0.28);
+  }
+}
+
+@theme inline {
+  --color-canvas: var(--app-canvas);
+  --color-surface: var(--app-surface);
+  --color-raised: var(--app-raised);
+  --color-line: var(--app-line);
+  --color-line-strong: var(--app-line-strong);
+  --color-content: var(--app-text);
+  --color-muted: var(--app-muted);
+  --color-faint: var(--app-faint);
+  --color-accent: var(--app-accent);
+  --color-accent-contrast: var(--app-accent-contrast);
+  --color-danger: var(--app-danger);
+  --color-success: var(--app-success);
+  --color-info: var(--app-info);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+}
+
+* {
+  border-color: var(--app-line);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--app-canvas);
+  color: var(--app-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--app-line-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* -------------------------------------------------------------------------
+   Component primitives
+   ------------------------------------------------------------------------- */
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-line
+           px-3 py-1.5 text-sm font-medium whitespace-nowrap transition
+           hover:border-line-strong hover:bg-raised
+           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
+           disabled:pointer-events-none disabled:opacity-45;
+  }
+
+  .btn-primary {
+    @apply border-transparent bg-accent text-accent-contrast
+           hover:bg-accent hover:brightness-110;
+  }
+
+  .btn-danger {
+    @apply border-transparent text-danger hover:bg-danger/10;
+  }
+
+  .btn-ghost {
+    @apply border-transparent text-muted hover:text-content;
+  }
+
+  .btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm
+           text-content placeholder:text-faint
+           focus:border-accent focus:outline-none;
+  }
+
+  .label {
+    @apply mb-1 block text-xs font-medium tracking-wide text-muted uppercase;
+  }
+
+  .card {
+    @apply rounded-lg border border-line bg-surface;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-line
+           px-2 py-0.5 text-[11px] font-medium text-muted;
+  }
+}

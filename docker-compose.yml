@@ -1,0 +1,42 @@
+# GGUF Editor — local-first stack.
+#
+#   MODELS_DIR=~/.ollama/models docker compose up --build
+#
+# The backend can only browse folders that are (a) mounted into its container
+# and (b) registered as a root. `GGUF_EDITOR_DEFAULT_ROOTS` registers the
+# mounted models directory automatically on first start.
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      # Origin the browser loads the UI from — must match for CORS to pass.
+      GGUF_EDITOR_CORS_ORIGINS: "http://localhost:${FRONTEND_PORT:-3000},http://127.0.0.1:${FRONTEND_PORT:-3000}"
+      GGUF_EDITOR_DEFAULT_ROOTS: "Models:/models"
+      GGUF_EDITOR_DATA_DIR: /data
+    volumes:
+      # Your GGUF files. Read-write so the editor can save edited copies;
+      # append `:ro` if you only ever want to inspect.
+      - "${MODELS_DIR:-./models}:/models"
+      # SQLite database, encryption key, and backups.
+      - gguf-editor-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the browser bundle at build time; change it (and rebuild)
+        # when the backend is reachable at a different host or port.
+        NEXT_PUBLIC_API_BASE_URL: "http://localhost:${BACKEND_PORT:-8000}/api"
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  gguf-editor-data:
