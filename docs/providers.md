@@ -9,6 +9,8 @@ Open **Providers** in the header, pick a preset (or **Custom provider**), fill
 in the model id, and save. Then hit **Test**: it calls the provider's model
 listing endpoint and reports what came back.
 
+![The providers dialog listing a configured provider with a successful connection test](images/providers.png)
+
 | Runtime | Kind | Base URL | Typical model |
 | --- | --- | --- | --- |
 | Ollama | `openai_compatible` | `http://localhost:11434/v1` | `llama3.1` |
@@ -70,6 +72,12 @@ Tools mutate an in-memory edit list only. The result comes back as
 `pending_edits` and appears in the metadata table marked **edited** — nothing
 is on disk until you press **Save…**, or unless **Auto-apply** is on, in which
 case the turn ends by writing a new file (with a backup) and reopening it.
+
+![A rebrand request in the assistant tab, showing the tool call, its result, and the summary reply](images/assistant.png)
+
+Every tool call is shown above the reply with the arguments it received and the
+text it returned, so a turn that did nothing useful is visible rather than
+hidden behind a confident summary.
 
 The loop runs at most six tool rounds per turn; if the model hits that limit it
 says so and you can ask it to continue.

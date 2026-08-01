@@ -9,6 +9,11 @@ table — or describe the change in plain language and let an LLM make it for
 you. Tensor data is never touched: edits rewrite only the key/value block, and
 the result is written atomically so an interrupted save can't corrupt a model.
 
+![The GGUF Editor workspace: model explorer on the left, metadata table on the right](docs/images/metadata.png)
+
+<sub>Screenshots use a small synthetic demo model, so the size and parameter
+count are not representative of a real 1.5B checkpoint.</sub>
+
 ```
 ┌──────────────┐        ┌───────────────────┐        ┌──────────────────┐
 │  Next.js UI  │ ─────▶ │  FastAPI backend  │ ─────▶ │  .gguf on disk   │
@@ -41,6 +46,43 @@ the result is written atomically so an interrupted save can't corrupt a model.
   `os.replace`.
 - **Encrypted credentials** — provider API keys are encrypted at rest with a
   locally generated Fernet key and are never returned to the browser.
+
+## Screenshots
+
+**Bulk rebrand, with a preview of exactly which fields change.**
+`general.architecture` and `tokenizer.*` are excluded by default — rewriting
+them is what makes a "rebranded" model stop loading.
+
+![The rebrand dialog showing a find/replace preview across four metadata fields](docs/images/rebrand.png)
+
+**The assistant edits through tools, not magic.** Each tool call and its result
+is shown above the reply, and the resulting changes are staged for review.
+
+![The assistant tab after a rebrand request, showing the bulk_rebrand tool call and its result](docs/images/assistant.png)
+
+**Staged changes are marked in the table** and stay pending until you save —
+note that `general.architecture` is untouched.
+
+![The metadata table with four fields marked as edited](docs/images/staged-edits.png)
+
+<details>
+<summary>More: tensors, providers, light theme</summary>
+
+**Tensor overview** — name, shape, dtype, and element count for every tensor,
+read from the header without loading any weights.
+
+![The tensors tab listing 98 tensors with shapes and dtypes](docs/images/tensors.png)
+
+**Providers** — presets for common runtimes, plus a connection test that lists
+the models the endpoint reports.
+
+![The providers dialog with a successful connection test](docs/images/providers.png)
+
+**Light theme** — follows the system colour scheme.
+
+![The same metadata table rendered in the light theme](docs/images/metadata-light.png)
+
+</details>
 
 ## Quickstart
 
