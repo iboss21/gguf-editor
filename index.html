@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GGUF Editor</title>
+  <meta name="description" content="View and edit GGUF model file metadata and tensor info, entirely in your browser." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>GGUF Editor</h1>
+    <p class="tagline">
+      View and edit metadata in <a href="https://github.com/ggml-org/ggml/blob/master/docs/gguf.md" target="_blank" rel="noopener">GGUF</a>
+      model files (llama.cpp and compatible runtimes) &mdash; entirely in your browser. Nothing is uploaded anywhere.
+    </p>
+  </header>
+
+  <main>
+    <section id="drop-zone" class="drop-zone">
+      <p><strong>Drag &amp; drop</strong> a <code>.gguf</code> file here, or</p>
+      <button id="choose-file-btn" type="button">Choose a file&hellip;</button>
+      <input id="file-input" type="file" accept=".gguf" hidden />
+    </section>
+
+    <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+
+    <section id="editor" class="editor" hidden>
+      <section class="summary-panel">
+        <h2 id="file-name" class="file-name"></h2>
+        <dl class="summary-grid">
+          <div><dt>File size</dt><dd id="summary-size"></dd></div>
+          <div><dt>GGUF version</dt><dd id="summary-version"></dd></div>
+          <div><dt>Tensors</dt><dd id="summary-tensor-count"></dd></div>
+          <div><dt>Metadata entries</dt><dd id="summary-kv-count"></dd></div>
+          <div><dt>Alignment</dt><dd id="summary-alignment"></dd></div>
+        </dl>
+        <div class="summary-actions">
+          <button id="export-btn" type="button" class="primary">Export edited GGUF</button>
+          <button id="reset-btn" type="button">Discard &amp; load another file</button>
+        </div>
+      </section>
+
+      <nav class="tabs" role="tablist">
+        <button id="tab-btn-metadata" class="tab-btn active" role="tab" aria-selected="true" data-tab="metadata">
+          Metadata
+        </button>
+        <button id="tab-btn-tensors" class="tab-btn" role="tab" aria-selected="false" data-tab="tensors">
+          Tensors
+        </button>
+      </nav>
+
+      <section id="tab-metadata" class="tab-panel" role="tabpanel">
+        <div class="panel-toolbar">
+          <input id="metadata-filter" type="search" placeholder="Filter by key&hellip;" />
+          <button id="add-metadata-btn" type="button">+ Add metadata entry</button>
+        </div>
+        <table class="data-table" id="metadata-table">
+          <thead>
+            <tr>
+              <th scope="col">Key</th>
+              <th scope="col">Type</th>
+              <th scope="col">Value</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section id="tab-tensors" class="tab-panel" role="tabpanel" hidden>
+        <div class="panel-toolbar">
+          <input id="tensor-filter" type="search" placeholder="Filter by name&hellip;" />
+        </div>
+        <table class="data-table" id="tensors-table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Type</th>
+              <th scope="col">Shape</th>
+              <th scope="col">Size</th>
+              <th scope="col">Offset</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="metadata-dialog">
+    <form method="dialog" id="metadata-form">
+      <h2 id="metadata-dialog-title">Add metadata entry</h2>
+      <p class="field">
+        <label for="metadata-key-input">Key</label>
+        <input id="metadata-key-input" type="text" list="well-known-keys" autocomplete="off" required />
+        <datalist id="well-known-keys"></datalist>
+      </p>
+      <p class="field">
+        <label for="metadata-type-select">Type</label>
+        <select id="metadata-type-select"></select>
+      </p>
+      <p class="field" id="metadata-item-type-field" hidden>
+        <label for="metadata-item-type-select">Array item type</label>
+        <select id="metadata-item-type-select"></select>
+      </p>
+      <p class="field" id="metadata-value-field">
+        <label for="metadata-value-input">Value</label>
+        <input id="metadata-value-input" type="text" autocomplete="off" />
+        <textarea id="metadata-value-textarea" rows="6" hidden placeholder="One value per line"></textarea>
+      </p>
+      <p id="metadata-form-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button type="button" id="metadata-cancel-btn">Cancel</button>
+        <button type="submit" id="metadata-save-btn" class="primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="rename-dialog">
+    <form method="dialog" id="rename-form">
+      <h2>Rename tensor</h2>
+      <p class="field">
+        <label for="rename-input">Name</label>
+        <input id="rename-input" type="text" autocomplete="off" required />
+      </p>
+      <p id="rename-form-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button type="button" id="rename-cancel-btn">Cancel</button>
+        <button type="submit" class="primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="app-footer">
+    <p>
+      gguf-editor &mdash; runs 100% locally in your browser. No files are ever uploaded to a server.
+      <a href="https://github.com/iboss21/gguf-editor" target="_blank" rel="noopener">Source on GitHub</a>
+    </p>
+  </footer>
+
+  <script type="module" src="./src/app.mjs"></script>
+</body>
+</html>
