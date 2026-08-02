@@ -1,0 +1,33 @@
+# --- Python -------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local runtime data: SQLite DB, Fernet secret key, GGUF backups.
+backend/data/
+*.db
+
+# --- Node / Next.js ------------------------------------------------------
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.eslintcache
+
+# --- Environment ---------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# --- Editors / OS --------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
